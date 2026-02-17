@@ -36,6 +36,9 @@ spec:
           command: ["streamlit", "run", "ui.py", "--server.port=8501", "--server.address=0.0.0.0"]
           ports:
             - containerPort: 8501
+          volumeMounts:
+            - name: tmp-dir
+              mountPath: /tmp
           env:
             - name: MPLCONFIGDIR
               value: "/tmp/matplotlib"
@@ -57,3 +60,6 @@ spec:
               value: "ai-observability"
             - name: MLFLOW_TRACING_ENABLED
               value: "true"
+      volumes:
+        - name: tmp-dir
+          emptyDir: {}
