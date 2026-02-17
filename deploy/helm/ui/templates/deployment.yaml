@@ -20,6 +20,8 @@ spec:
           ports:
             - containerPort: 8501
           env:
+            - name: MPLCONFIGDIR
+              value: "/tmp/matplotlib"
             - name: PROMETHEUS_URL
               value: "{{ .Values.env.PROMETHEUS_URL }}"
             - name: LLM_URL
