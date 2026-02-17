@@ -58,6 +58,11 @@ TEMPO_URL = os.getenv("TEMPO_URL", "http://localhost:8080")
 LLAMA_STACK_URL = os.getenv("LLAMA_STACK_URL", "http://localhost:8321/v1/openai/v1")
 LLM_API_TOKEN = os.getenv("LLM_API_TOKEN", "")
 
+# MLflow tracing configuration
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "")
+MLFLOW_EXPERIMENT_NAME = os.getenv("MLFLOW_EXPERIMENT_NAME", "ai-observability")
+MLFLOW_TRACING_ENABLED = os.getenv("MLFLOW_TRACING_ENABLED", "true").lower() == "true"
+
 # Tempo-specific configuration
 TEMPO_TENANT_ID = os.getenv("TEMPO_TENANT_ID", "dev")
 TEMPO_NAMESPACE = "observability-hub"

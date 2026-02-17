@@ -12,8 +12,10 @@ from typing import Optional, List, Dict, Any, Callable
 from .base import BaseChatBot
 from chatbots.tool_executor import ToolExecutor
 from common.pylogger import get_python_logger
+from core.mlflow_tracing import get_trace_decorator
 
 logger = get_python_logger()
+trace = get_trace_decorator()
 
 
 class DeterministicChatBot(BaseChatBot):
@@ -30,6 +32,7 @@ class DeterministicChatBot(BaseChatBot):
         """Local models don't require API keys."""
         return None
 
+    @trace(span_type="CHAIN", name="deterministic_chat")
     def chat(self, user_question: str, namespace: Optional[str] = None, progress_callback: Optional[Callable] = None) -> str:
         """Chat using deterministic parsing approach."""
         if progress_callback:

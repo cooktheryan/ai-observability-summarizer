@@ -11,8 +11,10 @@ from typing import Optional, List, Dict, Any, Callable
 
 from chatbots.tool_executor import ToolExecutor
 from common.pylogger import get_python_logger
+from core.mlflow_tracing import get_trace_decorator
 
 logger = get_python_logger()
+trace = get_trace_decorator()
 
 
 class BaseChatBot(ABC):
@@ -166,6 +168,7 @@ class BaseChatBot(ABC):
         except Exception:
             return q
 
+    @trace(span_type="TOOL", name="route_tool_call")
     def _route_tool_call_to_mcp(self, tool_name: str, arguments: Dict[str, Any]) -> str:
         """Route tool call via tool executor.
 
@@ -218,6 +221,7 @@ class BaseChatBot(ABC):
         """
         return 5000
 
+    @trace(span_type="TOOL", name="get_tool_result")
     def _get_tool_result(self, tool_name: str, tool_args: Dict[str, Any]) -> str:
         """Execute tool call and truncate result if needed.
 

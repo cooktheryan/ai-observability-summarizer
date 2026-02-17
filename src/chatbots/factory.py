@@ -15,6 +15,7 @@ from .google_bot import GoogleChatBot
 from .llama_bot import LlamaChatBot
 from .deterministic_bot import DeterministicChatBot
 from common.pylogger import get_python_logger
+from core.mlflow_tracing import setup_tracing
 
 logger = get_python_logger()
 
@@ -98,6 +99,8 @@ def create_chatbot(
             - Llama 3.2: Uses DeterministicChatBot (67% accuracy, deterministic parsing)
             - Unknown: Uses DeterministicChatBot (fallback for safety)
     """
+    setup_tracing()
+
     if tool_executor is None:
         raise ValueError(
             "tool_executor is required. Pass a ToolExecutor implementation "
