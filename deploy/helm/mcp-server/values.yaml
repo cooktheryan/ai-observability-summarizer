@@ -30,6 +30,9 @@ env:
   KORREL8R_URL: "https://korrel8r-summarizer.openshift-cluster-observability-operator.svc.cluster.local:9443"
   MAX_NUM_LOG_ROWS: 10
   KORREL8R_TIMEOUT_SECONDS: 8
+  MLFLOW_TRACKING_URI: ""
+  MLFLOW_EXPERIMENT_NAME: "ai-observability"
+  MLFLOW_TRACING_ENABLED: "true"
 
 # Name of the LLM used
 LLM_PREDICTOR: "llama-3-1-8b-instruct-predictor"

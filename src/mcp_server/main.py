@@ -8,6 +8,7 @@ import uvicorn
 from mcp_server.api import app
 from mcp_server.settings import settings, validate_config
 from common.pylogger import get_python_logger, get_uvicorn_log_config
+from core.mlflow_tracing import setup_tracing
 
 logger = get_python_logger()
 
@@ -33,6 +34,7 @@ def handle_startup_error(error: Exception, context: str = "server startup") -> N
 def main() -> None:
     try:
         validate_config(settings)
+        setup_tracing()
 
         logger.info(
             f"Server configured to use {settings.MCP_TRANSPORT_PROTOCOL} protocol"

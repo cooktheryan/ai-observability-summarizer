@@ -10,8 +10,10 @@ from typing import Optional, Callable
 from .base import BaseChatBot
 from chatbots.tool_executor import ToolExecutor
 from common.pylogger import get_python_logger
+from core.mlflow_tracing import get_trace_decorator
 
 logger = get_python_logger()
+trace = get_trace_decorator()
 
 
 class AnthropicChatBot(BaseChatBot):
@@ -56,6 +58,7 @@ class AnthropicChatBot(BaseChatBot):
 - Provide detailed pod-level and namespace-level breakdowns
 - Use your tool calling reliability for multi-step analysis"""
 
+    @trace(span_type="CHAIN", name="anthropic_chat")
     def chat(self, user_question: str, namespace: Optional[str] = None, progress_callback: Optional[Callable] = None) -> str:
         """Chat with Anthropic Claude using tool calling."""
         if not self.client:

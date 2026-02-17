@@ -79,6 +79,12 @@ spec:
             {{- end }}
             - name: MODEL_CONFIG
               value: '{{ .Values.modelConfig | toJson }}'
+            - name: MLFLOW_TRACKING_URI
+              value: "{{ .Values.env.MLFLOW_TRACKING_URI }}"
+            - name: MLFLOW_EXPERIMENT_NAME
+              value: "{{ .Values.env.MLFLOW_EXPERIMENT_NAME }}"
+            - name: MLFLOW_TRACING_ENABLED
+              value: "{{ .Values.env.MLFLOW_TRACING_ENABLED }}"
           livenessProbe:
             exec:
               command:

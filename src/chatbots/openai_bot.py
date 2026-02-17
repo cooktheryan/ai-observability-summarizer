@@ -11,8 +11,10 @@ from typing import Optional, List, Dict, Any, Callable
 from .base import BaseChatBot
 from chatbots.tool_executor import ToolExecutor
 from common.pylogger import get_python_logger
+from core.mlflow_tracing import get_trace_decorator
 
 logger = get_python_logger()
+trace = get_trace_decorator()
 
 
 class OpenAIChatBot(BaseChatBot):
@@ -77,6 +79,7 @@ class OpenAIChatBot(BaseChatBot):
             })
         return openai_tools
 
+    @trace(span_type="CHAIN", name="openai_chat")
     def chat(self, user_question: str, namespace: Optional[str] = None, progress_callback: Optional[Callable] = None) -> str:
         """Chat with OpenAI GPT using tool calling."""
         if not self.client:

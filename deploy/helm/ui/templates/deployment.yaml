@@ -32,3 +32,9 @@ spec:
               value: "{{ .Values.env.PYTHON_LOG_LEVEL }}"
             - name: MCP_SERVER_URL
               value: "http://{{ .Values.mcpServer.serviceName }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.mcpServer.port }}"
+            - name: MLFLOW_TRACKING_URI
+              value: "{{ .Values.env.MLFLOW_TRACKING_URI }}"
+            - name: MLFLOW_EXPERIMENT_NAME
+              value: "{{ .Values.env.MLFLOW_EXPERIMENT_NAME }}"
+            - name: MLFLOW_TRACING_ENABLED
+              value: "{{ .Values.env.MLFLOW_TRACING_ENABLED }}"

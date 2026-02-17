@@ -10,8 +10,10 @@ from typing import Optional, List, Dict, Any, Callable
 from .base import BaseChatBot
 from chatbots.tool_executor import ToolExecutor
 from common.pylogger import get_python_logger
+from core.mlflow_tracing import get_trace_decorator
 
 logger = get_python_logger()
+trace = get_trace_decorator()
 
 
 class GoogleChatBot(BaseChatBot):
@@ -162,6 +164,7 @@ class GoogleChatBot(BaseChatBot):
 
         return sdk_tools
 
+    @trace(span_type="CHAIN", name="google_chat")
     def chat(self, user_question: str, namespace: Optional[str] = None, progress_callback: Optional[Callable] = None) -> str:
         """Chat with Google Gemini using tool calling."""
         if not self.configured:

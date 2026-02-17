@@ -11,8 +11,10 @@ from .base import BaseChatBot
 from chatbots.tool_executor import ToolExecutor
 from core.config import LLAMA_STACK_URL, LLM_API_TOKEN
 from common.pylogger import get_python_logger
+from core.mlflow_tracing import get_trace_decorator
 
 logger = get_python_logger()
+trace = get_trace_decorator()
 
 
 class LlamaChatBot(BaseChatBot):
@@ -118,6 +120,7 @@ For Pod Status queries:
             })
         return openai_tools
 
+    @trace(span_type="CHAIN", name="llama_chat")
     def chat(self, user_question: str, namespace: Optional[str] = None, progress_callback: Optional[Callable] = None) -> str:
         """Chat with Llama using LlamaStack OpenAI-compatible API."""
         if not self.client:
