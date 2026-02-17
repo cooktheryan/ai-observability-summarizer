@@ -16,6 +16,7 @@
 #   - MLFLOW_TRACKING_URI: point to your MLflow instance
 #   - PROMETHEUS_URL: point to your Thanos/Prometheus endpoint
 #   - TEMPO_URL: point to your Tempo endpoint
+#   - MODEL_CONFIG: configure available summarization models (JSON)
 ---
 apiVersion: agent.kagenti.dev/v1alpha1
 kind: Agent
@@ -80,7 +81,7 @@ spec:
             - name: LLAMA_STACK_URL
               value: "http://lsd-llama32-3b-service.serving.svc.cluster.local:8321/v1/openai/v1"
             - name: MODEL_CONFIG
-              value: "{}"
+              value: '{"meta-llama/Llama-3.2-3B-Instruct":{"external":false,"requiresApiKey":false,"serviceName":"lsd-llama32-3b-service","provider":"llamastack","modelName":"llama32-3b"}}'
             - name: MLFLOW_TRACKING_URI
               value: "http://mlflow-service.mlflow.svc.cluster.local:5000"
             - name: MLFLOW_EXPERIMENT_NAME
