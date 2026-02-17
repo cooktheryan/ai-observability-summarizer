@@ -1,0 +1,104 @@
+# Namespace and RBAC resources for AI Observability Summarizer
+# These must be applied before the Kagenti Agent CRs.
+#
+# Usage:
+#   oc apply -f deploy/kagenti/namespace-rbac.yaml
+#
+# To customize the namespace, replace "ai-observability" throughout this file.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ai-observability
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mcp-analyzer
+  namespace: ai-observability
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mcp-analyzer
+  namespace: ai-observability
+  annotations:
+    kubernetes.io/service-account.name: mcp-analyzer
+type: kubernetes.io/service-account-token
+---
+# ConfigMap for OpenShift service CA injection (enables HTTPS verification for in-cluster services)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mcp-server-trusted-ca-bundle
+  namespace: ai-observability
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+data:
+  service-ca.crt: ""
+---
+# ClusterRoleBindings for Prometheus/Thanos access
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: view-thanos-ai-observability-mcp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+  - kind: ServiceAccount
+    name: mcp-analyzer
+    namespace: ai-observability
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-monitoring-view-thanos-ai-observability-mcp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-monitoring-view
+subjects:
+  - kind: ServiceAccount
+    name: mcp-analyzer
+    namespace: ai-observability
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: openshift-cluster-monitoring-view-thanos-ai-observability-mcp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: openshift-cluster-monitoring-view
+subjects:
+  - kind: ServiceAccount
+    name: mcp-analyzer
+    namespace: ai-observability
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: grafana-prometheus-reader-binding-ai-observability-mcp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: grafana-prometheus-reader
+subjects:
+  - kind: ServiceAccount
+    name: mcp-analyzer
+    namespace: ai-observability
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: korrel8r-view-binding-ai-observability-mcp
+subjects:
+  - kind: ServiceAccount
+    name: mcp-analyzer
+    namespace: ai-observability
+roleRef:
+  kind: ClusterRole
+  name: korrel8r-view
+  apiGroup: rbac.authorization.k8s.io

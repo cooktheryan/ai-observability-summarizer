@@ -1,0 +1,57 @@
+# Kagenti Agent CR for the Metrics UI component
+#
+# This deploys the Streamlit-based metrics dashboard as a Kagenti-managed agent.
+#
+# Prerequisites:
+#   - Kagenti platform installed (kagenti-system namespace)
+#   - namespace-rbac.yaml applied first
+#   - mcp-server-agent.yaml applied first (UI depends on MCP Server)
+#
+# Usage:
+#   oc apply -f deploy/kagenti/ui-agent.yaml
+#
+# Customize the following before applying:
+#   - image.repository / image.tag: set to your container registry
+#   - LLAMA_STACK_URL: point to your LLM inference service
+#   - MLFLOW_TRACKING_URI: point to your MLflow instance
+#   - MCP_SERVER_URL: point to the MCP Server service created by mcp-server-agent.yaml
+---
+apiVersion: agent.kagenti.dev/v1alpha1
+kind: Agent
+metadata:
+  name: aiobs-metrics-ui
+  namespace: ai-observability
+spec:
+  image:
+    repository: quay.io/rcook/aiobs-metrics-ui
+    tag: "1.0.0"
+  replicas: 1
+  port: 8501
+  podTemplateSpec:
+    spec:
+      containers:
+        - name: ui
+          image: quay.io/rcook/aiobs-metrics-ui:1.0.0
+          imagePullPolicy: IfNotPresent
+          command: ["streamlit", "run", "ui.py", "--server.port=8501", "--server.address=0.0.0.0"]
+          ports:
+            - containerPort: 8501
+          env:
+            - name: PROMETHEUS_URL
+              value: "https://thanos-querier.openshift-monitoring.svc.cluster.local:9091"
+            - name: LLM_URL
+              value: "http://lsd-llama32-3b-service.serving.svc.cluster.local:8321/v1/openai/v1"
+            - name: LLAMA_STACK_URL
+              value: "http://lsd-llama32-3b-service.serving.svc.cluster.local:8321/v1/openai/v1"
+            - name: LLM_API_TOKEN
+              value: ""
+            - name: PYTHON_LOG_LEVEL
+              value: "INFO"
+            - name: MCP_SERVER_URL
+              value: "http://aiobs-mcp-server.ai-observability.svc.cluster.local:8085"
+            - name: MLFLOW_TRACKING_URI
+              value: "http://mlflow-service.mlflow.svc.cluster.local:5000"
+            - name: MLFLOW_EXPERIMENT_NAME
+              value: "ai-observability"
+            - name: MLFLOW_TRACING_ENABLED
+              value: "true"
