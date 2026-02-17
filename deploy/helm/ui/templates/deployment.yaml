@@ -23,6 +23,10 @@ spec:
             - name: tmp-dir
               mountPath: /tmp
           env:
+            - name: HOME
+              value: "/tmp"
+            - name: STREAMLIT_HOME
+              value: "/tmp/.streamlit"
             - name: MPLCONFIGDIR
               value: "/tmp/matplotlib"
             - name: PROMETHEUS_URL
