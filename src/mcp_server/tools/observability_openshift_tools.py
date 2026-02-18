@@ -26,6 +26,9 @@ from mcp_server.exceptions import (
     parse_prometheus_error,
 )
 
+from core.mlflow_tracing import get_trace_decorator
+trace = get_trace_decorator()
+
 logger = get_python_logger()
 
 
@@ -45,6 +48,7 @@ def _classify_requests_error(e: Exception) -> str:
     except Exception:
         return "unknown"
 
+@trace(span_type="CHAIN", name="analyze_openshift")
 def analyze_openshift(
     metric_category: str,
     scope: str = "cluster_wide",
@@ -243,6 +247,7 @@ def list_openshift_namespaces() -> List[Dict[str, Any]]:
         )
         return err.to_mcp_response()
 
+@trace(span_type="CHAIN", name="chat_openshift")
 def chat_openshift(
     metric_category: str,
     question: str,

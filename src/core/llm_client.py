@@ -13,6 +13,8 @@ from datetime import datetime, timedelta, timezone, time
 from dateparser.search import search_dates
 
 from .config import MODEL_CONFIG, LLM_API_TOKEN, LLAMA_STACK_URL, VERIFY_SSL
+from core.mlflow_tracing import get_trace_decorator
+trace = get_trace_decorator()
 
 import logging
 from common.pylogger import get_python_logger
@@ -102,6 +104,7 @@ def _clean_llm_summary_string(text: str) -> str:
     return re.sub(r"\s+", " ", cleaned_text).strip()
 
 
+@trace(span_type="LLM", name="summarize_with_llm")
 def summarize_with_llm(
     prompt: str,
     summarize_model_id: str,

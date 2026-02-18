@@ -36,6 +36,8 @@ from core.config import PROMETHEUS_URL, THANOS_TOKEN, VERIFY_SSL, DEFAULT_TIME_R
 from core.config import KORREL8R_ENABLED
 import requests
 from datetime import datetime, timedelta
+from core.mlflow_tracing import get_trace_decorator
+trace = get_trace_decorator()
 
 # Import structured logger from MCP server utilities
 from common.pylogger import get_python_logger
@@ -247,6 +249,7 @@ def get_vllm_metrics_tool() -> List[Dict[str, Any]]:
         return error.to_mcp_response()
 
 
+@trace(span_type="CHAIN", name="analyze_vllm")
 def analyze_vllm(
     model_name: str,
     summarize_model_id: str,
@@ -544,6 +547,7 @@ def get_deployment_info(namespace: str, model: str) -> List[Dict[str, Any]]:
         return error.to_mcp_response()
 
 
+@trace(span_type="CHAIN", name="chat_vllm")
 def chat_vllm(
     model_name: str,
     prompt_summary: str,
