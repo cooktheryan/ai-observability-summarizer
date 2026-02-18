@@ -44,6 +44,8 @@ spec:
               value: "/tmp"
             - name: STREAMLIT_HOME
               value: "/tmp/.streamlit"
+            - name: STREAMLIT_THEME_BASE
+              value: "light"
             - name: MPLCONFIGDIR
               value: "/tmp/matplotlib"
             - name: PROMETHEUS_URL
