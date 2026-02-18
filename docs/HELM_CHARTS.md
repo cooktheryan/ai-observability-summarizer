@@ -129,6 +129,12 @@ The observability stack includes three main Helm charts:
 - **Dependencies**: Uses OpenTelemetry Collector Helm chart
 - **Features**: Trace collection, processing, and forwarding
 
+## Alternative: Kagenti Deployment
+
+For environments with the [Kagenti](https://github.com/kagenti/kagenti) platform, the UI and MCP Server can be deployed as Kagenti Agent CRs instead of Helm releases. See [KAGENTI_DEPLOYMENT.md](KAGENTI_DEPLOYMENT.md) for details.
+
+The Kagenti deployment manifests are located in `deploy/kagenti/`.
+
 ## Benefits of This Approach
 
 - **Simpler**: No template files or generation needed

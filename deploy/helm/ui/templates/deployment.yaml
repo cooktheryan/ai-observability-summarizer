@@ -19,7 +19,16 @@ spec:
           command: ["streamlit", "run", "ui.py", "--server.port=8501", "--server.address=0.0.0.0"]
           ports:
             - containerPort: 8501
+          volumeMounts:
+            - name: tmp-dir
+              mountPath: /tmp
           env:
+            - name: HOME
+              value: "/tmp"
+            - name: STREAMLIT_HOME
+              value: "/tmp/.streamlit"
+            - name: MPLCONFIGDIR
+              value: "/tmp/matplotlib"
             - name: PROMETHEUS_URL
               value: "{{ .Values.env.PROMETHEUS_URL }}"
             - name: LLM_URL
@@ -38,3 +47,6 @@ spec:
               value: "{{ .Values.env.MLFLOW_EXPERIMENT_NAME }}"
             - name: MLFLOW_TRACING_ENABLED
               value: "{{ .Values.env.MLFLOW_TRACING_ENABLED }}"
+      volumes:
+        - name: tmp-dir
+          emptyDir: {}

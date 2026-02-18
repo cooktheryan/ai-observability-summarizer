@@ -1,0 +1,135 @@
+# Kagenti Agent CR for the MCP Server component
+#
+# This deploys the MCP Server as a Kagenti-managed agent with full pod spec
+# including the mcp-analyzer ServiceAccount, Thanos token, and trusted CA volumes.
+#
+# Prerequisites:
+#   - Kagenti platform installed (kagenti-system namespace)
+#   - namespace-rbac.yaml applied first
+#
+# Usage:
+#   oc apply -f deploy/kagenti/mcp-server-agent.yaml
+#
+# Customize the following before applying:
+#   - image.repository / image.tag: set to your container registry
+#   - LLAMA_STACK_URL: point to your LLM inference service
+#   - MLFLOW_TRACKING_URI: point to your MLflow instance
+#   - PROMETHEUS_URL: point to your Thanos/Prometheus endpoint
+#   - TEMPO_URL: point to your Tempo endpoint
+#   - MODEL_CONFIG: configure available summarization models (JSON)
+---
+apiVersion: agent.kagenti.dev/v1alpha1
+kind: Agent
+metadata:
+  name: aiobs-mcp-server
+  namespace: ai-observability
+spec:
+  image:
+    repository: quay.io/rcook/aiobs-mcp-server
+    tag: "1.0.0"
+  replicas: 1
+  port: 8085
+  podTemplateSpec:
+    spec:
+      serviceAccountName: mcp-analyzer
+      restartPolicy: Always
+      containers:
+        - name: mcp-server
+          image: quay.io/rcook/aiobs-mcp-server:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8085
+              protocol: TCP
+          env:
+            - name: MCP_HOST
+              value: "0.0.0.0"
+            - name: MCP_PORT
+              value: "8085"
+            - name: MCP_TRANSPORT_PROTOCOL
+              value: "http"
+            - name: PYTHON_LOG_LEVEL
+              value: "INFO"
+            - name: PROMETHEUS_URL
+              value: "https://thanos-querier.openshift-monitoring.svc.cluster.local:9091"
+            - name: MAX_TIME_RANGE_DAYS
+              value: "90"
+            - name: DEFAULT_TIME_RANGE_DAYS
+              value: "7"
+            - name: TEMPO_URL
+              value: "https://tempo-tempostack-gateway.observability-hub.svc.cluster.local:8080"
+            - name: TEMPO_TENANT_ID
+              value: "dev"
+            - name: KORREL8R_ENABLED
+              value: "true"
+            - name: KORREL8R_URL
+              value: "https://korrel8r-summarizer.openshift-cluster-observability-operator.svc.cluster.local:9443"
+            - name: KORREL8R_TIMEOUT_SECONDS
+              value: "8"
+            - name: MAX_NUM_LOG_ROWS
+              value: "10"
+            - name: NAMESPACE
+              value: "ai-observability"
+            - name: THANOS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcp-analyzer
+                  key: token
+            - name: LLM_URL
+              value: "http://lsd-llama32-3b-service.serving.svc.cluster.local:8321/v1/openai/v1"
+            - name: LLM_API_TOKEN
+              value: ""
+            - name: LLAMA_STACK_URL
+              value: "http://lsd-llama32-3b-service.serving.svc.cluster.local:8321/v1/openai/v1"
+            - name: MODEL_CONFIG
+              value: '{"meta-llama/Llama-3.2-3B-Instruct":{"external":false,"requiresApiKey":false,"serviceName":"lsd-llama32-3b-service","provider":"llamastack","modelName":"llama32-3b"}}'
+            - name: MLFLOW_TRACKING_URI
+              value: "http://mlflow-service.mlflow.svc.cluster.local:5000"
+            - name: MLFLOW_EXPERIMENT_NAME
+              value: "ai-observability"
+            - name: MLFLOW_TRACING_ENABLED
+              value: "true"
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://0.0.0.0:8085/health
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 30
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://0.0.0.0:8085/health
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 20
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: "1"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          volumeMounts:
+            - name: thanos-token
+              mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+              readOnly: true
+            - name: trusted-ca
+              mountPath: /etc/pki/ca-trust/extracted/pem
+              readOnly: true
+      volumes:
+        - name: thanos-token
+          secret:
+            secretName: mcp-analyzer
+            defaultMode: 0440
+        - name: trusted-ca
+          configMap:
+            name: mcp-server-trusted-ca-bundle
+            items:
+              - key: service-ca.crt
+                path: ca-bundle.crt

@@ -54,6 +54,13 @@ Perfect for AI operations teams, platform engineers, and business stakeholders w
 
 ## Deploy
 
+### Deployment Options
+
+| Method | Description | Guide |
+|--------|-------------|-------|
+| **Makefile + Helm** | Full standalone deployment including LLM stack | See below |
+| **Kagenti** | Deploy via [Kagenti](https://github.com/kagenti/kagenti) platform with existing LLM service | [Kagenti Deployment Guide](docs/KAGENTI_DEPLOYMENT.md) |
+
 ### Installing the OpenShift AI Observability Summarizer
 
 Use the included `Makefile` to install everything:

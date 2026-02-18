@@ -1,0 +1,40 @@
+# OpenShift Routes for external access to the Kagenti-deployed services
+#
+# Usage:
+#   oc apply -f deploy/kagenti/routes.yaml
+#
+# Note: These routes use edge TLS termination. The host fields are auto-generated
+# by OpenShift based on the cluster's apps domain. To set explicit hosts, uncomment
+# and edit the host fields below.
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: aiobs-mcp-server-route
+  namespace: ai-observability
+spec:
+  to:
+    kind: Service
+    name: aiobs-mcp-server
+    weight: 100
+  port:
+    targetPort: 8085
+  tls:
+    termination: edge
+  # host: mcp-server-ai-observability.apps.<cluster-domain>
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: aiobs-metrics-ui-route
+  namespace: ai-observability
+spec:
+  to:
+    kind: Service
+    name: aiobs-metrics-ui
+    weight: 100
+  port:
+    targetPort: 8501
+  tls:
+    termination: edge
+  # host: metrics-ui-ai-observability.apps.<cluster-domain>
